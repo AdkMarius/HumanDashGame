@@ -5,7 +5,7 @@ namespace HumanDash.Entities;
 
 public abstract class Entity : IGameEntity
 {
-    protected Sprite Sprite { get; set; }
+    public Sprite Sprite { get; set; }
     
     public int DrawOrder { get; set; }
     
