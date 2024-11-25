@@ -1,6 +1,6 @@
 namespace HumanDash.Entities;
 
-public class Avatar
+public class Avatar : Entity
 {
     
 }

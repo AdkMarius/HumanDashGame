@@ -9,7 +9,10 @@
   <component name="ChangeListManager">
     <list default="true" id="1a7f7352-c4f8-496e-9f15-905270747dd3" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HumanDash/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HumanDash/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Content.mgcb" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Content.mgcb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entities/Avatar.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Entities/Avatar.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entities/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Entities/Entity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entities/IGameEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Entities/IGameEntity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entities/Sprite.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Entities/Sprite.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,7 +75,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1732523297968</updated>
-      <workItem from="1732523299052" duration="2313000" />
+      <workItem from="1732523299052" duration="3476000" />
     </task>
     <servers />
   </component>
