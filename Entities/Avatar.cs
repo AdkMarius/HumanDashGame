@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = System.Numerics.Vector2;
+//using System.Numerics;
+//using HumanDash.Enum;
 
 namespace HumanDash.Entities;
 
