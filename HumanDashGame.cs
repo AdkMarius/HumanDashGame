@@ -7,7 +7,11 @@ namespace HumanDash;
 
 public class HumanDashGame : Game
 {
+    private const int WINDOW_WIDTH = 600;
+    private const int WINDOW_HEIGHT = 200;
+    
     private const string RUNNER_TEXTURE_NAME = "runner";
+    private const string SLIDING_RUNNER_TEXTURE_NAME = "sliding-runner";
     private const string PNEU_TEXTURE_NAME = "pneu";
     private const string OISEAUX_TEXTURE_NAME = "oisaux";
     private const string PILE_DE_CARTONS_TEXTURE_NAME = "pile_de_cartons";
@@ -21,6 +25,7 @@ public class HumanDashGame : Game
     private SpriteBatch _spriteBatch;
     
     private Texture2D _runnerTexture;
+    private Texture2D _slidingRunnerTexture;
     private Texture2D _pneuTexture;
     private Texture2D _oisauxTexture;
     private Texture2D _pile_de_cartonsTexture;
@@ -40,7 +45,10 @@ public class HumanDashGame : Game
     protected override void Initialize()
     {
         // TODO: Add your initialization logic here
-
+        
+        _graphics.PreferredBackBufferWidth = WINDOW_WIDTH;
+        _graphics.PreferredBackBufferHeight = WINDOW_HEIGHT;
+        _graphics.ApplyChanges();
         base.Initialize();
     }
 
@@ -50,6 +58,9 @@ public class HumanDashGame : Game
 
         // TODO: use this.Content to load your game content here
         _runnerTexture = Content.Load<Texture2D>(RUNNER_TEXTURE_NAME);
+        _slidingRunnerTexture = Content.Load<Texture2D>(SLIDING_RUNNER_TEXTURE_NAME);
+        
+        
     }
 
     protected override void Update(GameTime gameTime)
@@ -68,7 +79,7 @@ public class HumanDashGame : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
-
+        
         base.Draw(gameTime);
     }
 }
