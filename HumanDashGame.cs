@@ -1,14 +1,19 @@
-﻿using Microsoft.Xna.Framework;
+﻿using HumanDash.Entities;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Vector2 = System.Numerics.Vector2;
 
 namespace HumanDash;
 
 public class HumanDashGame : Game
 {
-    private const int WINDOW_WIDTH = 600;
-    private const int WINDOW_HEIGHT = 200;
+    private const int WINDOW_WIDTH = 1200;
+    private const int WINDOW_HEIGHT = 600;
+    
+    private const int RUNNER_DEFAULT_POSX = 20;
+    private const int RUNNER_DEFAULT_POSY = 300;
     
     private const string RUNNER_TEXTURE_NAME = "runner";
     private const string SLIDING_RUNNER_TEXTURE_NAME = "sliding-runner";
@@ -20,7 +25,7 @@ public class HumanDashGame : Game
     private const string BUTTON_PRESS_SOUND_NAME = "button-press";
     private const string HIT_OBSTACLE_SOUND_NAME = "hit";
     private const string SCORE_REACHED_SOUND_NAME = "score";
-    
+
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     
@@ -34,6 +39,8 @@ public class HumanDashGame : Game
     private SoundEffect _buttonPressSound;
     private SoundEffect _scoreReachedSound;
     private SoundEffect _hitObstacleSound;
+    
+    private Avatar _slidingAvatar;
 
     public HumanDashGame()
     {
@@ -59,8 +66,8 @@ public class HumanDashGame : Game
         // TODO: use this.Content to load your game content here
         _runnerTexture = Content.Load<Texture2D>(RUNNER_TEXTURE_NAME);
         _slidingRunnerTexture = Content.Load<Texture2D>(SLIDING_RUNNER_TEXTURE_NAME);
-        
-        
+
+        _slidingAvatar = new Avatar(_slidingRunnerTexture, new Vector2(RUNNER_DEFAULT_POSX, RUNNER_DEFAULT_POSY), _buttonPressSound);
     }
 
     protected override void Update(GameTime gameTime)
@@ -79,6 +86,9 @@ public class HumanDashGame : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
+        _spriteBatch.Begin();
+        _slidingAvatar.Draw(gameTime, _spriteBatch);
+        _spriteBatch.End();
         
         base.Draw(gameTime);
     }
