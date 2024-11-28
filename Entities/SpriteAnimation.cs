@@ -12,7 +12,7 @@ public class SpriteAnimation : Entity
     private List<SpriteAnimationFrame> _frames;
     public bool IsPlaying { get; private set; }
 
-    public double _PlayBackProgess;
+    public double _PlayBackProgess;//temps depuis le début de l'animation en cours
     
     public double PlayBackProgess
     {
@@ -20,7 +20,7 @@ public class SpriteAnimation : Entity
         private set => _PlayBackProgess = value;
     }
 
-    public void addFrame(Sprite sprite, double timeStamp)
+    public void addFrame(Sprite sprite, double timeStamp)//ajoute un frame à notre liste de frames en attribut
     {
         _frames.Add(new SpriteAnimationFrame(sprite, timeStamp));
     }
@@ -29,7 +29,7 @@ public class SpriteAnimation : Entity
     {
         if (IsPlaying)
         {
-            _PlayBackProgess += gameTime.ElapsedGameTime.TotalSeconds;
+            _PlayBackProgess += gameTime.ElapsedGameTime.TotalSeconds;//Met à jour le playback progress définit plus haut
         }
         else
         {
@@ -43,13 +43,13 @@ public class SpriteAnimation : Entity
         _PlayBackProgess = 0;
     }
 
-    public void Stop()
+    public void Stop()//Arrete l'animation
     {
         IsPlaying = false;
         _PlayBackProgess = 0;
     }
 
-    public SpriteAnimationFrame GetFrame(int index)
+    public SpriteAnimationFrame GetFrame(int index)//renvoie le frame à l'indice de la liste correspondant
     {
         if (index < 0 || index >= _frames.Count)
         {

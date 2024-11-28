@@ -16,7 +16,7 @@ public class SpriteAnimationFrame : Entity
         {
            if (Sprite == null)
            {
-               throw new ArgumentNullException(nameof(value), "Le sprite ne peut pas être null");
+               throw new ArgumentNullException(nameof(value), "Le sprite ne peut pas être null");//exception si le sprite est donné est nul
 
            }
            else
