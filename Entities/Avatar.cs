@@ -32,7 +32,7 @@ public class Avatar : Entity
     protected bool drop(){
         return false;
     }
-    //aucune idee pourquoi canard
+    //aucune idee pourquoi canard *_*
     protected bool duck(){
         return false;
     }
