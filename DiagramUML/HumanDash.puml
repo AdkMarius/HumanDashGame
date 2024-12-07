@@ -1,0 +1,147 @@
+@startuml
+class Game{
+ 
+}
+
+class HumanDashGame{
+    - _player{get; set;} : Player
+    - _entity{ get; set;} : EntityManager
+}
+class EntityManager {
+    - _entities : List<IGameEntity>
+    + AddEntity(entity: IGameEntity) : void
+    + RemoveEntity(entity: IGameEntity) : void
+    + ClearEntity() : void
+    + UpdateEntities(gameTime: GameTime) : void
+    + DrawEntities(gameTime: GameTime, spriteBatch:SpriteBatch) : void
+}
+
+interface IGameEntity{
+    + DrawOrder{ get; } : int
+    + Update (gameTime: GameTime) : void
+    + Draw (gameTime: GameTime, spriteBatch: SpriteBatch) : void
+}
+
+
+class ScoreBoard {
+    +Score { get; set; } : int
+    +HighScore { get; set; }: int
+}
+
+class Player {
+    + PseudoName { get; set; } : String
+    + Score { get; set; } : ScoreBoard
+}
+
+class Entity {
+    Sprite { get; set; } : Sprite
+}
+
+class Avatar {
+    - _nbLife : int 
+    + State { get; } : AvatarState
+    + Position { get; set; } : Vector2D
+    + Speed { get; set; }
+    + IsAlive { get; } : bool
+    + NbLife { get; set; } : int
+    + StartJump () : bool 
+    + CancelJump () : bool
+    + GetUp () : bool 
+    + Drop () : bool 
+    + Duck () : bool 
+    + Die () : bool
+}
+
+enum AvatarState{
+    Idle
+    Jumping
+    Running
+    Ducking
+}
+
+class Sprite{
+    + Texture { get; set; } : Texture2D
+    + X { get; set; } : int
+    + Y { get; set; } : int
+    + Width { get; set; } : int
+    + Height { get; set; } : int
+    + Draw(spriteBatch:SpriteBatch) : void
+}
+
+class SpriteAnimationFrame{
+    + Sprite { get; set; }
+    + TimeStamp { get; } : double
+}
+
+class SpriteAnimation{
+    - _frames: List<SpriteAnimationFrame>
+    + isPlaying { get; set; } : bool
+    + AddFrame (sprite : Sprite,  timeStamp : Double) : double
+    + Update (gameTime: GameTime) : void
+    + Start() : void
+    + Stop () : void
+    + GetFrame(index: int) : SpriteAnimationFrame    
+}
+
+class GroundObstacle{
+    
+}
+
+class FlyingObstacle{
+
+}
+
+class ObstacleManager{
+
+}
+
+class DecorManager {
+    
+}
+
+class GroundManager {
+    - _groundTiles : List<GroundTiles>
+}
+
+class GroundTile{
+    
+}
+  
+Game <|-- HumanDashGame
+
+Entity <|-- Decor
+Entity <|-- Obstacle
+Entity <|-- Avatar
+Entity <|-- GroundTile
+
+Obstacle <|-- GroundObstacle
+Obstacle <|-- FlyingObstacle
+
+IGameEntity <|.. Entity
+IGameEntity <|.. Decor
+IGameEntity <|.. EntityManager
+IGameEntity <|.. ScoreBoard
+IGameEntity <|.. GroundTile
+IGameEntity <|.. GroundManager
+
+HumanDashGame o--> Player 
+
+Player o--> ScoreBoard
+
+EntityManager *--> HumanDashGame
+
+DecorManager *--> Decor
+
+Avatar o--> AvatarState
+
+SpriteAnimation *--> SpriteAnimationFrame
+
+SpriteAnimationFrame o--> Sprite
+
+ObstacleManager *--> Obstacle
+
+Entity o--> Sprite
+
+GroundManager *--> GroundTile
+
+@enduml
