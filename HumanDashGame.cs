@@ -1,4 +1,7 @@
 ﻿using HumanDash.Entities;
+using HumanDash.Enum;
+using HumanDash.Manager;
+using HumanDash.System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -40,13 +43,19 @@ public class HumanDashGame : Game
     private SoundEffect _scoreReachedSound;
     private SoundEffect _hitObstacleSound;
     
-    private Avatar _slidingAvatar;
+    private Avatar _avatar;
+    private EntityManager _entityManager;
+    private InputController _inputController;
+    
+    public GameState GameState { get; set; }
 
     public HumanDashGame()
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
+        _entityManager = new EntityManager();
+        GameState = GameState.Initial;
     }
 
     protected override void Initialize()
@@ -66,8 +75,12 @@ public class HumanDashGame : Game
         // TODO: use this.Content to load your game content here
         _runnerTexture = Content.Load<Texture2D>(RUNNER_TEXTURE_NAME);
         _slidingRunnerTexture = Content.Load<Texture2D>(SLIDING_RUNNER_TEXTURE_NAME);
+        _buttonPressSound = Content.Load<SoundEffect>(BUTTON_PRESS_SOUND_NAME);
 
-        _slidingAvatar = new Avatar(_slidingRunnerTexture, new Vector2(RUNNER_DEFAULT_POSX, RUNNER_DEFAULT_POSY), _buttonPressSound);
+        _avatar = new Avatar(_slidingRunnerTexture, _runnerTexture, new Vector2(RUNNER_DEFAULT_POSX, RUNNER_DEFAULT_POSY), _buttonPressSound);
+        _inputController = new InputController(_avatar);
+        
+        _entityManager.AddEntity(_avatar);
     }
 
     protected override void Update(GameTime gameTime)
@@ -77,7 +90,8 @@ public class HumanDashGame : Game
             Exit();
 
         // TODO: Add your update logic here
-
+        _inputController.ProcessControls(gameTime);
+        _entityManager.UpdateEntities(gameTime);
         base.Update(gameTime);
     }
 
@@ -87,7 +101,7 @@ public class HumanDashGame : Game
 
         // TODO: Add your drawing code here
         _spriteBatch.Begin();
-        _slidingAvatar.Draw(gameTime, _spriteBatch);
+        _entityManager.DrawEntities(gameTime, _spriteBatch);
         _spriteBatch.End();
         
         base.Draw(gameTime);

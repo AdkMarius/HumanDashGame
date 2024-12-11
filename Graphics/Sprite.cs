@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace HumanDash.Entities;
+namespace HumanDash.Graphics;
 
 public class Sprite
 {
