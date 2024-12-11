@@ -1,3 +1,4 @@
+using System;
 using HumanDash.Enum;
 using HumanDash.Graphics;
 using Microsoft.Xna.Framework;
@@ -28,7 +29,7 @@ public class Avatar : IGameEntity
     private const int AVATAR_SLIDING_TEXTURE_WIDTH = 80;
     private const int AVATAR_SLIDING_TEXTURE_HEIGHT = 70;
     private const int NUMBER_OF_FRAME_IN_SLIDING_ANNIMATION = 5;
-    private const float SLIDING_ANIMATION_TIMESTAMP = 0.5f;
+    private const float SLIDING_ANIMATION_TIMESTAMP = 0.2f;
 
 
     private const float JUMPING_VELOCITY = -480f;
@@ -36,6 +37,8 @@ public class Avatar : IGameEntity
     private const float GRAVITY = 1600f;
     private const float MINIMUM_JUMPING_VALUE = 40f;
     private const float DROP_VELOCITY = 300f;
+
+    private const float START_GAME_SPEED = 300f;
 
     private int _nbLife;
     public AvatarState State {get; set;}
@@ -45,7 +48,7 @@ public class Avatar : IGameEntity
     public int DrawOrder { get; set; }
 
     public Vector2 Position {get; set;}
-    public double Speed {get; set;}
+    public float Speed { get; private set; }
     public bool IsAlive {get;}
     public int NbLife {get; set;}
     
@@ -56,6 +59,8 @@ public class Avatar : IGameEntity
     private Sprite _idleSprite;
     private SpriteAnimation _runningAnimation;
     private SpriteAnimation _slidingAnimation;
+    
+    public event EventHandler JumpComplete;
     
     // contructeur de avatar pour l'avatar au repos
     public Avatar(Texture2D slidingSpritesheet, Texture2D runningSpritesheet, Vector2 position, SoundEffect jumpingSound)
@@ -157,6 +162,8 @@ public class Avatar : IGameEntity
                 
                 // much be AvatarState.Running
                 State = AvatarState.Running;
+                
+                OnJumpComplete();
             }
         } else if (State == AvatarState.Running)
         {
@@ -210,5 +217,17 @@ public class Avatar : IGameEntity
         {
             AddSpriteInFrameAnimation(spriteSheet, AVATAR_SLIDING_TEXTURE_POSX, AVATAR_RUNNING_TEXTURE_POSY, AVATAR_SLIDING_TEXTURE_WIDTH, AVATAR_SLIDING_TEXTURE_HEIGHT, i, NUMBER_OF_FRAME_IN_SLIDING_ANNIMATION, _slidingAnimation, SLIDING_ANIMATION_TIMESTAMP);
         }
+    }
+    
+    protected virtual void OnJumpComplete()
+    {
+        EventHandler handler = JumpComplete;
+        handler?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void Initialize()
+    {
+        Speed = START_GAME_SPEED;
+        State = AvatarState.Running;
     }
 }

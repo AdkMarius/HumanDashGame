@@ -1,4 +1,5 @@
-﻿using HumanDash.Entities;
+﻿using System;
+using HumanDash.Entities;
 using HumanDash.Enum;
 using HumanDash.Manager;
 using HumanDash.System;
@@ -12,11 +13,11 @@ namespace HumanDash;
 
 public class HumanDashGame : Game
 {
-    private const int WINDOW_WIDTH = 1200;
-    private const int WINDOW_HEIGHT = 600;
+    private const int WINDOW_WIDTH = 545;
+    private const int WINDOW_HEIGHT = 300;
     
-    private const int RUNNER_DEFAULT_POSX = 20;
-    private const int RUNNER_DEFAULT_POSY = 300;
+    private const int RUNNER_DEFAULT_POSX = 2;
+    private const int RUNNER_DEFAULT_POSY = 188;
     
     private const string RUNNER_TEXTURE_NAME = "runner";
     private const string SLIDING_RUNNER_TEXTURE_NAME = "sliding-runner";
@@ -25,6 +26,7 @@ public class HumanDashGame : Game
     private const string PILE_DE_CARTONS_TEXTURE_NAME = "pile_de_cartons";
     private const string DECOR_TEXTURE_NAME = "decor";
     private const string BRIQUES_TEXTURE_NAME = "briques";
+    private const string SOL_TEXTURE_NAME = "sol";
     private const string BUTTON_PRESS_SOUND_NAME = "button-press";
     private const string HIT_OBSTACLE_SOUND_NAME = "hit";
     private const string SCORE_REACHED_SOUND_NAME = "score";
@@ -39,6 +41,7 @@ public class HumanDashGame : Game
     private Texture2D _pile_de_cartonsTexture;
     private Texture2D _decorTexture;
     private Texture2D _briquesTexture;
+    private Texture2D _solTexture;
     private SoundEffect _buttonPressSound;
     private SoundEffect _scoreReachedSound;
     private SoundEffect _hitObstacleSound;
@@ -46,8 +49,11 @@ public class HumanDashGame : Game
     private Avatar _avatar;
     private EntityManager _entityManager;
     private InputController _inputController;
+    private GroundManager _groundManager;
     
     public GameState GameState { get; set; }
+    
+    private KeyboardState _previousKeyboardState;
 
     public HumanDashGame()
     {
@@ -67,6 +73,15 @@ public class HumanDashGame : Game
         _graphics.ApplyChanges();
         base.Initialize();
     }
+    
+    private void avatar_JumpComplete(object sender, EventArgs e)
+    {
+        if (GameState == GameState.Transition)
+        {
+            GameState = GameState.Playing;
+            _avatar.Initialize();
+        }
+    }
 
     protected override void LoadContent()
     {
@@ -75,12 +90,18 @@ public class HumanDashGame : Game
         // TODO: use this.Content to load your game content here
         _runnerTexture = Content.Load<Texture2D>(RUNNER_TEXTURE_NAME);
         _slidingRunnerTexture = Content.Load<Texture2D>(SLIDING_RUNNER_TEXTURE_NAME);
+        _solTexture = Content.Load<Texture2D>(SOL_TEXTURE_NAME);
         _buttonPressSound = Content.Load<SoundEffect>(BUTTON_PRESS_SOUND_NAME);
 
         _avatar = new Avatar(_slidingRunnerTexture, _runnerTexture, new Vector2(RUNNER_DEFAULT_POSX, RUNNER_DEFAULT_POSY), _buttonPressSound);
+        _avatar.DrawOrder = 10;
+        _avatar.JumpComplete += avatar_JumpComplete;
+        
+        _groundManager = new GroundManager(_solTexture, _avatar);
         _inputController = new InputController(_avatar);
         
         _entityManager.AddEntity(_avatar);
+        _entityManager.AddEntity(_groundManager);
     }
 
     protected override void Update(GameTime gameTime)
@@ -89,21 +110,51 @@ public class HumanDashGame : Game
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        // TODO: Add your update logic here
-        _inputController.ProcessControls(gameTime);
+        KeyboardState _keyboardState = new KeyboardState();
+        if (GameState == GameState.Initial)
+        {
+            KeyboardState currentKeyboardState = Keyboard.GetState();
+            bool isJumpingKeyPressed = currentKeyboardState.IsKeyDown(Keys.Up) || currentKeyboardState.IsKeyDown(Keys.Space);
+            bool wasJumpingKeyPressed = _previousKeyboardState.IsKeyDown(Keys.Up) || _previousKeyboardState.IsKeyDown(Keys.Space);
+        
+            if (!wasJumpingKeyPressed && isJumpingKeyPressed)
+            {
+                if (_avatar.State != AvatarState.Jumping && _avatar.State != AvatarState.Falling)
+                {
+                    StartGame();
+                }
+            }
+        }
+        else if (GameState == GameState.Playing)
+        {
+            _inputController.ProcessControls(gameTime);
+        } 
+        
+        _previousKeyboardState = _keyboardState;
         _entityManager.UpdateEntities(gameTime);
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        GraphicsDevice.Clear(Color.White);
 
-        // TODO: Add your drawing code here
         _spriteBatch.Begin();
         _entityManager.DrawEntities(gameTime, _spriteBatch);
         _spriteBatch.End();
         
         base.Draw(gameTime);
+    }
+
+    private bool StartGame()
+    {
+        if (GameState != GameState.Initial)
+        {
+            return false;
+        }
+
+        GameState = GameState.Transition;
+        _avatar.StartJump();
+        return true;
     }
 }

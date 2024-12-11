@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HumanDash.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -37,11 +38,6 @@ public class EntityManager
         _entitiesToRemove.Add(entity);
     }
 
-    public void ClearEntities()
-    {
-        
-    }
-
     public void UpdateEntities(GameTime gameTime)
     {
         foreach (IGameEntity entity in _entities)
@@ -65,9 +61,14 @@ public class EntityManager
 
     public void DrawEntities(GameTime gameTime, SpriteBatch spriteBatch)
     {
-        foreach (var entity in _entities)
+        foreach (var entity in _entities.OrderBy(f => f.DrawOrder))
         {
             entity.Draw(gameTime, spriteBatch);
         }
+    }
+
+    public void ClearEntities()
+    {
+        _entitiesToRemove.AddRange(_entities);
     }
 }
