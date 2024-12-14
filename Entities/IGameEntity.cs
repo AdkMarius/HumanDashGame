@@ -11,3 +11,4 @@ public interface IGameEntity
     
     void Draw(GameTime gameTime, SpriteBatch spriteBatch);
 }
+

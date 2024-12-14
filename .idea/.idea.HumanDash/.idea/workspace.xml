@@ -7,7 +7,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1a7f7352-c4f8-496e-9f15-905270747dd3" name="Changes" comment="" />
+    <list default="true" id="1a7f7352-c4f8-496e-9f15-905270747dd3" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Manager/SkyManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.HumanDash/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HumanDash/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entities/IGameEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Entities/IGameEntity.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

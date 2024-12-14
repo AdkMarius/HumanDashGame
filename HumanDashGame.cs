@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using HumanDash.Manager;
 
 namespace HumanDash;
 
@@ -8,6 +9,9 @@ public class HumanDashGame : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
+
+    private Texture2D _skyTexture; // Texture pour les nuages
+    private SkyManager _skyManager; // Gestionnaire des nuages
 
     public HumanDashGame()
     {
@@ -18,8 +22,7 @@ public class HumanDashGame : Game
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
-
+        // Initialisation de base
         base.Initialize();
     }
 
@@ -27,7 +30,11 @@ public class HumanDashGame : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        // TODO: use this.Content to load your game content here
+        // Charger la texture des nuages
+        _skyTexture = Content.Load<Texture2D>("decor"); // Assurez-vous que "cloud.png" est dans le pipeline de contenu
+
+        // Initialiser le SkyManager avec la texture des nuages
+        _skyManager = new SkyManager(_skyTexture);
     }
 
     protected override void Update(GameTime gameTime)
@@ -36,7 +43,8 @@ public class HumanDashGame : Game
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        // TODO: Add your update logic here
+        // Mettre à jour les nuages
+        _skyManager.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -45,7 +53,10 @@ public class HumanDashGame : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        // TODO: Add your drawing code here
+        // Dessiner les nuages
+        _spriteBatch.Begin();
+        _skyManager.Draw(gameTime, _spriteBatch);
+        _spriteBatch.End();
 
         base.Draw(gameTime);
     }
