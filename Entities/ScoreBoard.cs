@@ -1,4 +1,7 @@
 using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
 using HumanDash.Graphics;
 using HumanDash.Interfaces;
 using Microsoft.Xna.Framework;
@@ -6,6 +9,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace HumanDash.Entities;
 
+[XmlRoot("jeu:game", Namespace = "http://www.univ-grenoble-alpes.fr/l3miage/humanDash")]
+[Serializable]
 public class ScoreBoard : IGameEntity
 {
     private const int TEXTURE_COORDS_NUMBER_X = 655;
@@ -23,15 +28,24 @@ public class ScoreBoard : IGameEntity
     private const int NUMBER_DIGITS_TO_DRAW = 5;
     private const float SCORE_INCREMENT_MULTIPLIER = 0.05f;
 
-    public double Score { get; set; }
+    private XmlDocument doc;
+    private XmlNamespaceManager nsmgr;
     
-    public int DisplayScore => (int)Math.Floor(Score);
+    private static string binPath = AppDomain.CurrentDomain.BaseDirectory;
+    private static string projectDirectory = Directory.GetParent(binPath)?.Parent?.Parent?.Parent?.FullName;
+    private string FilePath = Path.Combine(projectDirectory, "humanDashGame.xml");
+
+    [XmlIgnore] public double Score { get; set; }
     
-    public int HighestScore { get; set; }
+    [XmlIgnore] public int DisplayScore => (int)Math.Floor(Score);
     
-    public bool HasHighScore => HighestScore > 0;
+    [XmlElement("highScore")] public int HighestScore { get; private set; }
     
-    public Vector2 Position { get; private set; }
+    [XmlIgnore] public bool HasHighScore => HighestScore > 0;
+    
+    [XmlIgnore] public Vector2 Position { get; private set; }
+    
+    [XmlIgnore] public int DrawOrder { get; set; } = 100;
 
     private Avatar _avatar;
     
@@ -44,9 +58,15 @@ public class ScoreBoard : IGameEntity
         Position = position;
         _avatar = avatar;
         _texture = texture;
+        
+        // chargement du fichier
+        doc = new XmlDocument();
+        doc.Load(FilePath);
+            
+        // definir l'espace de nom
+        nsmgr = new XmlNamespaceManager(doc.NameTable);
+        nsmgr.AddNamespace("jeu", "http://www.univ-grenoble-alpes.fr/l3miage/humanDash");
     }
-
-    public int DrawOrder { get; set; } = 100;
     
     public void Update(GameTime gameTime)
     {
@@ -108,11 +128,28 @@ public class ScoreBoard : IGameEntity
         return new Rectangle(posX, posY, TEXTURE_COORDS_NUMBER_WIDTH, TEXTURE_COORDS_NUMBER_HEIGHT);
     }
 
-    public void setHighScore()
+        public void GetHighScoreFromXmlFile()
+        {
+            XmlNode highScoreNode = doc.SelectSingleNode("//jeu:highScore", nsmgr);
+            if (highScoreNode != null)
+            {
+                string highScoreString = highScoreNode.InnerText;
+                HighestScore = int.Parse(highScoreString);
+            }
+    }
+
+    public void SetHighScore()
     {
         if (HighestScore == 0)
             HighestScore = DisplayScore;
         else if (HighestScore < DisplayScore)
             HighestScore = DisplayScore;
+        
+        XmlNode highScoreNode = doc.SelectSingleNode("//jeu:highScore", nsmgr);
+        if (highScoreNode != null)
+        {
+            highScoreNode.InnerText = Convert.ToString(HighestScore); 
+            doc.Save(FilePath);
+        } 
     }
 }

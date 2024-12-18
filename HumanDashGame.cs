@@ -2,6 +2,7 @@
 using System.Timers;
 using HumanDash.Entities;
 using HumanDash.Enum;
+using HumanDash.Exception;
 using HumanDash.Manager;
 using HumanDash.System;
 using Microsoft.Xna.Framework;
@@ -29,9 +30,6 @@ public class HumanDashGame : Game
     private const string BUTTON_PRESS_SOUND_NAME = "button-press";
     private const string HIT_OBSTACLE_SOUND_NAME = "hit";
     private const string SCORE_REACHED_SOUND_NAME = "score";
-
-    private GraphicsDeviceManager _graphics;
-    private SpriteBatch _spriteBatch;
     
     private Texture2D _runnerTexture;
     private Texture2D _slidingRunnerTexture;
@@ -54,6 +52,9 @@ public class HumanDashGame : Game
     public GameState GameState { get; set; }
     
     private KeyboardState _previousKeyboardState;
+    
+    private GraphicsDeviceManager _graphics;
+    private SpriteBatch _spriteBatch;
 
     public HumanDashGame()
     {
@@ -88,7 +89,7 @@ public class HumanDashGame : Game
         GameState = GameState.GameOver;
         _obstacleManager.IsEnabled = false;
         _gameOverScreen.IsEnabled = true;
-        _scoreBoard.setHighScore();
+        _scoreBoard.SetHighScore();
     }
 
     protected override void LoadContent()
@@ -110,6 +111,7 @@ public class HumanDashGame : Game
         _avatar.Died += avatar_Died;
         
         _scoreBoard = new ScoreBoard(_spriteSheet, new Vector2(WINDOW_WIDTH - 150, WINDOW_HEIGHT - 270), _avatar);
+        _scoreBoard.GetHighScoreFromXmlFile();
 
         _gameOverScreen = new GameOverScreen(_spriteSheet) { IsEnabled = false };
         _gameOverScreen.Position =
@@ -135,7 +137,7 @@ public class HumanDashGame : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
-
+        
         KeyboardState _keyboardState = new KeyboardState();
         if (GameState == GameState.Initial)
         {
@@ -164,7 +166,6 @@ public class HumanDashGame : Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.White);
-
         _spriteBatch.Begin();
         _entityManager.DrawEntities(gameTime, _spriteBatch);
         _spriteBatch.End();
