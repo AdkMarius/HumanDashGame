@@ -4,11 +4,33 @@ class Game{
 }
 
 class HumanDashGame{
-    - _player{get; set;} : Player
-    - _entity{ get; set;} : EntityManager
+    - _runnerTexture : Texture2D
+    - _slidingRunnerTexture : Texture2D
+    - _decorTexture : Texture2D
+    - _solTexture : Texture2D
+    - _spriteSheet : Texture2D
+    - _buttonPressSound : SoundEffect
+    - _hitObstacleSound : SoundEffect
+    - _previousKeyboardState : keyboardState
+    - _graphics : GraphicsDeviceManager
+    - _spriteBatch : SpriteBatch
+    + HumanDashGame()
+    - _player { get; set; } : Player
+    - _entity { get; set; } : EntityManager
+    - StartGame() : bool
+    - game_replay(sender : object, e: EvenArgs) : void
+    - avatar_JumComplete( sender : object, e : EventArgs) : void
+    - avatar_Died( sender : object, e : EventArgs) : void
+    # Initialize() : void
+    # LoadContent() : void
+    # Update() : void
+    # Draw() : void 
 }
 class EntityManager {
     - _entities : List<IGameEntity>
+    - _entitiesToAdd : List<IGameEntity>
+    - _entitiesToRemote : List<IGameEntity>
+    + EntityManager()
     + AddEntity(entity: IGameEntity) : void
     + RemoveEntity(entity: IGameEntity) : void
     + ClearEntity() : void
@@ -55,11 +77,20 @@ class Avatar {
 enum AvatarState{
     Idle
     Jumping
+    Falling
     Running
-    Ducking
+    Sliding
+}
+
+enum GameState {
+    Initial
+    Transition
+    Playing
+    GameOne
 }
 
 class Sprite{
+    + Sprite (texture : Texture2D, x : int, y : int, width : int, height : int)
     + Texture { get; set; } : Texture2D
     + X { get; set; } : int
     + Y { get; set; } : int
@@ -76,13 +107,51 @@ class SpriteAnimationFrame{
 class SpriteAnimation{
     - _frames: List<SpriteAnimationFrame>
     + isPlaying { get; set; } : bool
-    + AddFrame (sprite : Sprite,  timeStamp : Double) : double
+    + playbackProgress { get; set; } : double
+    + CurrentFrame { get; } : SpriteAnimationFrame
+    + Duration { get; } : double
+    +AddFrame(spite : Sprite, timeStamp : Double) : void
     + Update (gameTime: GameTime) : void
     + Start() : void
     + Stop () : void
     + GetFrame(index: int) : SpriteAnimationFrame    
 }
 
+class InputController{
+    - _avatar : Avatar
+    - _previousKeyboardState : keyboardState
+    + InputController(avatar : Avatar)
+    + ProcessControls(gameTime: GameTime) : void
+    
+}
+
+interface ICollidable {
+    + CollisionBox { get; } : Rectangle
+}
+
+enum ObstacleType {
+    Panel 
+    StopPanel
+    Trash
+}
+
+enum TrashSize {
+    Small
+    Medium
+    Large
+}
+
+class GameOverScreen {
+    - _textSprite : Sprite
+    - _buttonSprite : Sprite
+    + GameOverScreen (texture : Texture2D)
+    - ButtonBounds { get; } : Rectangle
+    - ButtonPosition { get; } : Vector2
+    + Position { get; set; } Vector2
+    + IsEnabled { get; set; } : bool
+    +Replay : EventHandler
+    
+}
 class GroundObstacle{
     
 }
@@ -101,6 +170,13 @@ class DecorManager {
 
 class GroundManager {
     - _groundTiles : List<GroundTiles>
+    - _random : _random
+    - _avatar : Avatar
+    + GroundManager(groundTileTexture : Texture2D, avatar: Avatar)
+    - createGroundTiles(GroundTileTexture : Texture2D) : void
+    - Initialize() : void
+    - SpawnTile(GroundTile : GroundTile) : void
+    - GetRightMostTilePosition() : float
 }
 
 class GroundTile{
