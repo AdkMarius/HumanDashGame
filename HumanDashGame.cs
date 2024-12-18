@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Timers;
 using HumanDash.Entities;
 using HumanDash.Enum;
 using HumanDash.Manager;
@@ -13,19 +14,17 @@ namespace HumanDash;
 
 public class HumanDashGame : Game
 {
-    private const int WINDOW_WIDTH = 545;
-    private const int WINDOW_HEIGHT = 300;
+    public const int WINDOW_WIDTH = 545;
+    public const int WINDOW_HEIGHT = 300;
     
     private const int RUNNER_DEFAULT_POSX = 2;
     private const int RUNNER_DEFAULT_POSY = 188;
     
     private const string RUNNER_TEXTURE_NAME = "runner";
     private const string SLIDING_RUNNER_TEXTURE_NAME = "sliding-runner";
-    private const string PNEU_TEXTURE_NAME = "pneu";
-    private const string OISEAUX_TEXTURE_NAME = "oisaux";
-    private const string PILE_DE_CARTONS_TEXTURE_NAME = "pile_de_cartons";
+    private const string BIRDS_TEXTURE_NAME = "oisaux";
     private const string DECOR_TEXTURE_NAME = "decor";
-    private const string BRIQUES_TEXTURE_NAME = "briques";
+    private const string GAME_OVER_TEXTURE_NAME = "game-over";
     private const string SOL_TEXTURE_NAME = "sol";
     private const string BUTTON_PRESS_SOUND_NAME = "button-press";
     private const string HIT_OBSTACLE_SOUND_NAME = "hit";
@@ -36,20 +35,21 @@ public class HumanDashGame : Game
     
     private Texture2D _runnerTexture;
     private Texture2D _slidingRunnerTexture;
-    private Texture2D _pneuTexture;
-    private Texture2D _oisauxTexture;
-    private Texture2D _pile_de_cartonsTexture;
+    private Texture2D _birdsTexture;
     private Texture2D _decorTexture;
-    private Texture2D _briquesTexture;
     private Texture2D _solTexture;
+    private Texture2D _spriteSheet;
     private SoundEffect _buttonPressSound;
     private SoundEffect _scoreReachedSound;
     private SoundEffect _hitObstacleSound;
     
     private Avatar _avatar;
-    private EntityManager _entityManager;
+    private readonly EntityManager _entityManager;
     private InputController _inputController;
     private GroundManager _groundManager;
+    private ObstacleManager _obstacleManager;
+    private GameOverScreen _gameOverScreen;
+    private ScoreBoard _scoreBoard;
     
     public GameState GameState { get; set; }
     
@@ -83,6 +83,14 @@ public class HumanDashGame : Game
         }
     }
 
+    private void avatar_Died(object sender, EventArgs e)
+    {
+        GameState = GameState.GameOver;
+        _obstacleManager.IsEnabled = false;
+        _gameOverScreen.IsEnabled = true;
+        _scoreBoard.setHighScore();
+    }
+
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -91,17 +99,35 @@ public class HumanDashGame : Game
         _runnerTexture = Content.Load<Texture2D>(RUNNER_TEXTURE_NAME);
         _slidingRunnerTexture = Content.Load<Texture2D>(SLIDING_RUNNER_TEXTURE_NAME);
         _solTexture = Content.Load<Texture2D>(SOL_TEXTURE_NAME);
+        _decorTexture = Content.Load<Texture2D>(DECOR_TEXTURE_NAME);
+        _spriteSheet = Content.Load<Texture2D>(GAME_OVER_TEXTURE_NAME);
         _buttonPressSound = Content.Load<SoundEffect>(BUTTON_PRESS_SOUND_NAME);
+        _hitObstacleSound = Content.Load<SoundEffect>(HIT_OBSTACLE_SOUND_NAME);
 
-        _avatar = new Avatar(_slidingRunnerTexture, _runnerTexture, new Vector2(RUNNER_DEFAULT_POSX, RUNNER_DEFAULT_POSY), _buttonPressSound);
+        _avatar = new Avatar(_slidingRunnerTexture, _runnerTexture, new Vector2(RUNNER_DEFAULT_POSX, RUNNER_DEFAULT_POSY), _buttonPressSound, _hitObstacleSound);
         _avatar.DrawOrder = 10;
         _avatar.JumpComplete += avatar_JumpComplete;
+        _avatar.Died += avatar_Died;
+        
+        _scoreBoard = new ScoreBoard(_spriteSheet, new Vector2(WINDOW_WIDTH - 150, WINDOW_HEIGHT - 270), _avatar);
+
+        _gameOverScreen = new GameOverScreen(_spriteSheet) { IsEnabled = false };
+        _gameOverScreen.Position =
+            new Vector2(WINDOW_WIDTH / 2 - GameOverScreen.GAME_OVER_SPRITE_WIDTH / 2, WINDOW_HEIGHT / 2 - 30);
+        _gameOverScreen.Replay += game_replay;
         
         _groundManager = new GroundManager(_solTexture, _avatar);
+        
+        _obstacleManager = new ObstacleManager(_avatar, _decorTexture, _scoreBoard);
+        _obstacleManager.IsEnabled = true;
+        
         _inputController = new InputController(_avatar);
         
         _entityManager.AddEntity(_avatar);
         _entityManager.AddEntity(_groundManager);
+        _entityManager.AddEntity(_obstacleManager);
+        _entityManager.AddEntity(_gameOverScreen);
+        _entityManager.AddEntity(_scoreBoard);
     }
 
     protected override void Update(GameTime gameTime)
@@ -156,5 +182,19 @@ public class HumanDashGame : Game
         GameState = GameState.Transition;
         _avatar.StartJump();
         return true;
+    }
+
+    private void game_replay(object sender, EventArgs e)
+    {
+        if (GameState != GameState.GameOver)
+            return;
+
+        GameState = GameState.Playing;
+        _avatar.Initialize();
+        _avatar.Position = new Vector2(RUNNER_DEFAULT_POSX, RUNNER_DEFAULT_POSY);
+        _obstacleManager.RemoveAllObstacles();
+        _obstacleManager.Initialize();
+        _gameOverScreen.IsEnabled = false;
+        _scoreBoard.Score = 0;
     }
 }

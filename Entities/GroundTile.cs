@@ -1,5 +1,6 @@
 using System;
 using HumanDash.Graphics;
+using HumanDash.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

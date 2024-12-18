@@ -1,16 +1,15 @@
 using System;
 using HumanDash.Enum;
 using HumanDash.Graphics;
+using HumanDash.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = System.Numerics.Vector2;
-//using System.Numerics;
-//using HumanDash.Enum;
 
 namespace HumanDash.Entities;
 
-public class Avatar : IGameEntity
+public class Avatar : IGameEntity, ICollidable
 {
     private const int AVATAR_IDLE_TEXTURE_POSX = 247;
     private const int AVATAR_IDLE_TEXTURE_POSY = 8;
@@ -32,25 +31,41 @@ public class Avatar : IGameEntity
     private const float SLIDING_ANIMATION_TIMESTAMP = 0.2f;
 
 
-    private const float JUMPING_VELOCITY = -480f;
+    private const float JUMPING_VELOCITY = -680f;
     private const float CANCEL_JUMPING_VELOCITY = -100f;
     private const float GRAVITY = 1600f;
     private const float MINIMUM_JUMPING_VALUE = 40f;
     private const float DROP_VELOCITY = 300f;
 
-    private const float START_GAME_SPEED = 300f;
+    public const float START_GAME_SPEED = 300f;
+    public const float MAX_SPEED = 1500f;
+    private const float ACCELERATION_PPS_PER_SECOND = 5f;
 
-    private int _nbLife;
+    public Rectangle CollisionBox
+    {
+        get
+        {
+            Rectangle box = new Rectangle(
+                (int)Math.Round(Position.X),
+                (int)Math.Round(Position.Y),
+                AVATAR_RUNNING_TEXTURE_WIDTH,
+                AVATAR_RUNNING_TEXTURE_HEIGHT    
+            );
+            box.Inflate(-20, -5);
+            return box;
+        }
+    }
+
     public AvatarState State {get; set;}
     
     private SoundEffect _jumpingSound;
+    private SoundEffect _hitSound;
     
     public int DrawOrder { get; set; }
 
     public Vector2 Position {get; set;}
     public float Speed { get; private set; }
-    public bool IsAlive {get;}
-    public int NbLife {get; set;}
+    public bool IsAlive { get; private set; }
     
     private float _verticalVelocity;
     private float _dropVelocity;
@@ -61,9 +76,10 @@ public class Avatar : IGameEntity
     private SpriteAnimation _slidingAnimation;
     
     public event EventHandler JumpComplete;
+    public event EventHandler Died;
     
     // contructeur de avatar pour l'avatar au repos
-    public Avatar(Texture2D slidingSpritesheet, Texture2D runningSpritesheet, Vector2 position, SoundEffect jumpingSound)
+    public Avatar(Texture2D slidingSpritesheet, Texture2D runningSpritesheet, Vector2 position, SoundEffect jumpingSound, SoundEffect hitObstacleSound)
     {
         Position = position;
         _idleSprite = new Sprite(
@@ -74,7 +90,9 @@ public class Avatar : IGameEntity
             AVATAR_IDLE_HEIGHT
         );
         State = AvatarState.Idle;
+        IsAlive = true;
         _jumpingSound = jumpingSound;
+        _hitSound = hitObstacleSound;
         _startRunnerPosY = position.Y;
 
         _runningAnimation = new SpriteAnimation();
@@ -172,8 +190,19 @@ public class Avatar : IGameEntity
         {
             _slidingAnimation.Update(gameTime);
         }
+        
+        if (State != AvatarState.Idle)
+        {
+            Speed += ACCELERATION_PPS_PER_SECOND * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (Speed > MAX_SPEED)
+                Speed = MAX_SPEED;
+            
+        }
 
         _dropVelocity = 0;
+        
+        Console.WriteLine(Speed);
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -225,9 +254,31 @@ public class Avatar : IGameEntity
         handler?.Invoke(this, EventArgs.Empty);
     }
 
+    protected virtual void OnDied()
+    {
+        EventHandler handler = Died;
+        handler?.Invoke(this, EventArgs.Empty);
+    }
+
     public void Initialize()
     {
         Speed = START_GAME_SPEED;
         State = AvatarState.Running;
+        IsAlive = true;
+    }
+
+    public bool Die()
+    {
+        if (!IsAlive)
+        {
+            return false;
+        }
+
+        _hitSound.Play();
+        IsAlive = false;
+        Speed = 0;
+        State = AvatarState.Idle;
+        OnDied();
+        return true;
     }
 }

@@ -10,7 +10,7 @@ public class Sprite
     public int Width { get; set; }
     public int Height { get; set; }
     public Texture2D Texture { get; private set; }
-    
+
     public Color TintColor { get; set; } = Color.White;
 
     public Sprite(Texture2D texture, int x, int y, int width, int height)
