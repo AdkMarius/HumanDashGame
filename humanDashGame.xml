@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<jeu:game xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jeu="http://www.univ-grenoble-alpes.fr/l3miage/humanDash" xsi:schemaLocation="http://www.univ-grenoble-alpes.fr/l3miage/humanDash humanDashGame.xsd">
+  <jeu:highScore>45</jeu:highScore>
+</jeu:game>
