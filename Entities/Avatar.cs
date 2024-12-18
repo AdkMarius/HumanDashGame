@@ -201,8 +201,6 @@ public class Avatar : IGameEntity, ICollidable
         }
 
         _dropVelocity = 0;
-        
-        Console.WriteLine(Speed);
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)

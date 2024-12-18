@@ -5,13 +5,13 @@ namespace HumanDash.Graphics;
 
 public class Sprite
 {
-    public int X { get; set; }
-    public int Y { get; set; }
+    private int X { get; set; }
+    private int Y { get; set; }
     public int Width { get; set; }
     public int Height { get; set; }
-    public Texture2D Texture { get; private set; }
+    private Texture2D Texture { get;  set; }
 
-    public Color TintColor { get; set; } = Color.White;
+    private Color TintColor { get; set; } = Color.White;
 
     public Sprite(Texture2D texture, int x, int y, int width, int height)
     {
