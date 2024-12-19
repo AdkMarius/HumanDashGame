@@ -49,24 +49,6 @@
 /processorParam:Quality=Best
 /build:hit.mp3
 
-#begin la_vie_quon_mene.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:la_vie_quon_mene.mp3
-
-#begin oiseaux.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:oiseaux.png
-
 #begin runner.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -78,12 +60,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:runner.png
-
-#begin score-reached.mp3
-/importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:score-reached.mp3
 
 #begin sliding-runner.png
 /importer:TextureImporter

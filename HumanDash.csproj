@@ -14,10 +14,10 @@
         <None Remove="Icon.ico" />
         <None Remove="Icon.bmp" />
         <None Remove="Content\LaVieQuonMene.mp3" />
-        <None Update="humanDashGame.xml">
+        <None Update="xsd\humanDashGame.xsd">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="humanDashGame.xsd">
+        <None Update="xml\humanDashGame.xml">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>

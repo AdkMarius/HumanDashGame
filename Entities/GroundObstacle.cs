@@ -24,7 +24,7 @@ public class GroundObstacle : Obstacle
     private const int PANEL_TEXTURE_WIDTH = 38;
     private const int PANEL_TEXTURE_HEIGHT = 78;
     
-    private static int _spriteWidth
+    private int _spriteWidth
     {
         get
         {

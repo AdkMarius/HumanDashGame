@@ -2,7 +2,6 @@
 using System.Timers;
 using HumanDash.Entities;
 using HumanDash.Enum;
-using HumanDash.Exception;
 using HumanDash.Manager;
 using HumanDash.System;
 using Microsoft.Xna.Framework;
@@ -23,22 +22,18 @@ public class HumanDashGame : Game
     
     private const string RUNNER_TEXTURE_NAME = "runner";
     private const string SLIDING_RUNNER_TEXTURE_NAME = "sliding-runner";
-    private const string BIRDS_TEXTURE_NAME = "oisaux";
     private const string DECOR_TEXTURE_NAME = "decor";
     private const string GAME_OVER_TEXTURE_NAME = "game-over";
     private const string SOL_TEXTURE_NAME = "sol";
     private const string BUTTON_PRESS_SOUND_NAME = "button-press";
     private const string HIT_OBSTACLE_SOUND_NAME = "hit";
-    private const string SCORE_REACHED_SOUND_NAME = "score";
     
     private Texture2D _runnerTexture;
     private Texture2D _slidingRunnerTexture;
-    private Texture2D _birdsTexture;
     private Texture2D _decorTexture;
     private Texture2D _solTexture;
     private Texture2D _spriteSheet;
     private SoundEffect _buttonPressSound;
-    private SoundEffect _scoreReachedSound;
     private SoundEffect _hitObstacleSound;
     
     private Avatar _avatar;
@@ -49,7 +44,7 @@ public class HumanDashGame : Game
     private GameOverScreen _gameOverScreen;
     private ScoreBoard _scoreBoard;
     
-    public GameState GameState { get; set; }
+    private GameState GameState { get; set; }
     
     private KeyboardState _previousKeyboardState;
     
@@ -96,7 +91,6 @@ public class HumanDashGame : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        // TODO: use this.Content to load your game content here
         _runnerTexture = Content.Load<Texture2D>(RUNNER_TEXTURE_NAME);
         _slidingRunnerTexture = Content.Load<Texture2D>(SLIDING_RUNNER_TEXTURE_NAME);
         _solTexture = Content.Load<Texture2D>(SOL_TEXTURE_NAME);

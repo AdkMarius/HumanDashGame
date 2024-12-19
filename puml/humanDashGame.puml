@@ -1,0 +1,15 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+namespace XMLSchema {
+
+    class positiveInteger
+   
+}
+
+namespace humanDash {
+    class Game {
+        + highScore: positiveInteger
+    }
+}
+@enduml

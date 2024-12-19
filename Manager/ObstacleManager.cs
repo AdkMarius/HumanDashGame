@@ -14,17 +14,16 @@ public class ObstacleManager : IGameEntity
     private const int MIN_OBSTACLE_DISTANCE = 20;
     private const int MAX_OBSTACLE_DISTANCE = 50;
     private const float MIN_SPAWN_DISTANCE = 20f;
-
-    private ScoreBoard _scoreBoard { get; }
     
     private const int OBSTACLE_DISTANCE_SPEED_TOLERANCE = 5;
-
     private const int OBSTACLE_DRAW_ORDER = 12;
-
-    private double _lastSpawnScore { get; set; }
-    private double _currentTargetDistance { get; set; }
-
     private const int OBSTACLE_SPRITE_POS_Y = 180;
+
+    private ScoreBoard ScoreBoard { get; }
+
+    private double LastSpawnScore { get; set; }
+    private double CurrentTargetDistance { get; set; }
+
     public bool IsEnabled { get; set; }
     
     private Random _random;
@@ -35,20 +34,17 @@ public class ObstacleManager : IGameEntity
     // list of obstacles
     private readonly List<Obstacle> _obstacles;
     
-    // a copy of the collection, accessible by other class
-    public IEnumerable<Obstacle> Obstacles => new ReadOnlyCollection<Obstacle>(_obstacles);
-    
     // a list of removed obstacles
     private readonly List<Obstacle> _removedObstacles;
     
-    private bool CanSpawnObstacles => IsEnabled && _scoreBoard.Score >= MIN_SPAWN_DISTANCE;
+    private bool CanSpawnObstacles => IsEnabled && ScoreBoard.Score >= MIN_SPAWN_DISTANCE;
 
     public ObstacleManager(Avatar avatar, Texture2D spriteSheet, ScoreBoard scoreBoard)
     {
         _random = new Random();
         _avatar = avatar;
         _spriteSheet = spriteSheet;
-        _scoreBoard = scoreBoard;
+        ScoreBoard = scoreBoard;
         _obstacles = new List<Obstacle>();
         _removedObstacles = new List<Obstacle>();
     }
@@ -87,14 +83,14 @@ public class ObstacleManager : IGameEntity
         if (!IsEnabled)
             return;
 
-        if (CanSpawnObstacles && (_lastSpawnScore <= 0 || _scoreBoard.Score - _lastSpawnScore >= _currentTargetDistance))
+        if (CanSpawnObstacles && (LastSpawnScore <= 0 || ScoreBoard.Score - LastSpawnScore >= CurrentTargetDistance))
         {
-            _currentTargetDistance = _random.NextDouble() * (MAX_OBSTACLE_DISTANCE - MIN_OBSTACLE_DISTANCE) +
+            CurrentTargetDistance = _random.NextDouble() * (MAX_OBSTACLE_DISTANCE - MIN_OBSTACLE_DISTANCE) +
                                      MIN_OBSTACLE_DISTANCE;
 
-            _currentTargetDistance += (_avatar.Speed - Avatar.START_GAME_SPEED) / (Avatar.MAX_SPEED - Avatar.START_GAME_SPEED) * OBSTACLE_DISTANCE_SPEED_TOLERANCE;
+            CurrentTargetDistance += (_avatar.Speed - Avatar.START_GAME_SPEED) / (Avatar.MAX_SPEED - Avatar.START_GAME_SPEED) * OBSTACLE_DISTANCE_SPEED_TOLERANCE;
             
-            _lastSpawnScore = _scoreBoard.Score;
+            LastSpawnScore = ScoreBoard.Score;
 
             SpawnRandomObstacle();
         }
@@ -134,8 +130,8 @@ public class ObstacleManager : IGameEntity
 
     public void Initialize()
     {
-        _lastSpawnScore = 0;
-        _currentTargetDistance = 0;
+        LastSpawnScore = 0;
+        CurrentTargetDistance = 0;
         IsEnabled = true;
     }
 }

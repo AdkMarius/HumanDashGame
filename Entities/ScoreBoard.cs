@@ -28,12 +28,12 @@ public class ScoreBoard : IGameEntity
     private const int NUMBER_DIGITS_TO_DRAW = 5;
     private const float SCORE_INCREMENT_MULTIPLIER = 0.05f;
 
-    private XmlDocument doc;
-    private XmlNamespaceManager nsmgr;
+    private XmlDocument _doc;
+    private XmlNamespaceManager _nsmgr;
     
-    private static string binPath = AppDomain.CurrentDomain.BaseDirectory;
-    private static string projectDirectory = Directory.GetParent(binPath)?.Parent?.Parent?.Parent?.FullName;
-    private string FilePath = Path.Combine(projectDirectory, "humanDashGame.xml");
+    private static string _binPath = AppDomain.CurrentDomain.BaseDirectory;
+    private static string _projectDirectory = Directory.GetParent(_binPath)?.Parent?.Parent?.Parent?.FullName;
+    private string _filePath = Path.Combine(_projectDirectory, "xml/humanDashGame.xml");
 
     [XmlIgnore] public double Score { get; set; }
     
@@ -51,7 +51,7 @@ public class ScoreBoard : IGameEntity
     
     private Texture2D _texture;
     private Sprite _scoreSprite;
-    private Sprite _hIScoreSprite;
+    private Sprite _hILettersSprite;
 
     public ScoreBoard(Texture2D texture, Vector2 position, Avatar avatar)
     {
@@ -60,12 +60,12 @@ public class ScoreBoard : IGameEntity
         _texture = texture;
         
         // chargement du fichier
-        doc = new XmlDocument();
-        doc.Load(FilePath);
+        _doc = new XmlDocument();
+        _doc.Load(_filePath);
             
         // definir l'espace de nom
-        nsmgr = new XmlNamespaceManager(doc.NameTable);
-        nsmgr.AddNamespace("jeu", "http://www.univ-grenoble-alpes.fr/l3miage/humanDash");
+        _nsmgr = new XmlNamespaceManager(_doc.NameTable);
+        _nsmgr.AddNamespace("jeu", "http://www.univ-grenoble-alpes.fr/l3miage/humanDash");
     }
     
     public void Update(GameTime gameTime)
@@ -78,9 +78,9 @@ public class ScoreBoard : IGameEntity
         if (HasHighScore)
         {
             DrawScore(spriteBatch, HighestScore, Position.X);
-            _hIScoreSprite = new Sprite(_texture, TEXTURE_COORDS_HI_X, TEXTURE_COORDS_HI_Y, TEXTURE_COORDS_HI_WIDTH, 
+            _hILettersSprite = new Sprite(_texture, TEXTURE_COORDS_HI_X, TEXTURE_COORDS_HI_Y, TEXTURE_COORDS_HI_WIDTH, 
                 TEXTURE_COORDS_HI_HEIGHT);
-            _hIScoreSprite.Draw(spriteBatch, new Vector2(Position.X - HI_TEXT_MARGIN, Position.Y));
+            _hILettersSprite.Draw(spriteBatch, new Vector2(Position.X - HI_TEXT_MARGIN, Position.Y));
         }
         
         DrawScore(spriteBatch, DisplayScore, Position.X + 80);
@@ -115,27 +115,14 @@ public class ScoreBoard : IGameEntity
         return result;
     }
 
-    private Rectangle GetDigitTextureBounds(int digit)
+    public void GetHighScoreFromXmlFile()
     {
-        if (digit < 0 || digit > 9)
+        XmlNode highScoreNode = _doc.SelectSingleNode("//jeu:highScore", _nsmgr);
+        if (highScoreNode != null)
         {
-            throw new ArgumentOutOfRangeException(nameof(digit), "The digit must be between 0 or 9");
+            string highScoreString = highScoreNode.InnerText;
+            HighestScore = int.Parse(highScoreString);
         }
-
-        int posX = TEXTURE_COORDS_NUMBER_X + digit * TEXTURE_COORDS_NUMBER_WIDTH;
-        int posY = TEXTURE_COORDS_NUMBER_Y;
-
-        return new Rectangle(posX, posY, TEXTURE_COORDS_NUMBER_WIDTH, TEXTURE_COORDS_NUMBER_HEIGHT);
-    }
-
-        public void GetHighScoreFromXmlFile()
-        {
-            XmlNode highScoreNode = doc.SelectSingleNode("//jeu:highScore", nsmgr);
-            if (highScoreNode != null)
-            {
-                string highScoreString = highScoreNode.InnerText;
-                HighestScore = int.Parse(highScoreString);
-            }
     }
 
     public void SetHighScore()
@@ -145,11 +132,11 @@ public class ScoreBoard : IGameEntity
         else if (HighestScore < DisplayScore)
             HighestScore = DisplayScore;
         
-        XmlNode highScoreNode = doc.SelectSingleNode("//jeu:highScore", nsmgr);
+        XmlNode highScoreNode = _doc.SelectSingleNode("//jeu:highScore", _nsmgr);
         if (highScoreNode != null)
         {
             highScoreNode.InnerText = Convert.ToString(HighestScore); 
-            doc.Save(FilePath);
+            _doc.Save(_filePath);
         } 
     }
 }

@@ -14,7 +14,7 @@ public abstract class Obstacle : IGameEntity, ICollidable
     
     public Vector2 Position { get; private set; }
 
-    protected Avatar _avatar;
+    private Avatar _avatar;
     
     public Sprite Sprite { get; set; }
     

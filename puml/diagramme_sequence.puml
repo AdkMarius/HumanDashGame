@@ -1,0 +1,42 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+Player -> System: click to start game
+activate System
+
+System -> System: load game
+
+loop while user doesn't close the game
+    System -> Xml: GetHighScoreFromXmlFile()
+    activate Xml
+    
+    Xml -> System: return HighestScore
+    destroy Xml
+    
+    System -> Player: print gameInterface
+    destroy System
+    
+    loop while not collision
+        Player -> System: click Space or Direction Up or Direction Down
+        activate System
+        
+        System -> System: StartJump(), CancelJump(),\n Drop(), Slide(), GetUp()
+        destroy System
+    end 
+    
+    opt collision
+        System -> Player: print Game Over with Replay button
+        activate System
+        
+        System -> System: save game state
+        
+        System -> Xml: SaveHighScore()
+        activate Xml
+        
+        Xml -> Xml: change value of \nhigh score
+        destroy Xml
+        
+        Player -> System: click Replay button
+    end
+end 
+@enduml

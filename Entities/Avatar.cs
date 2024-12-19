@@ -78,7 +78,6 @@ public class Avatar : IGameEntity, ICollidable
     public event EventHandler JumpComplete;
     public event EventHandler Died;
     
-    // contructeur de avatar pour l'avatar au repos
     public Avatar(Texture2D slidingSpritesheet, Texture2D runningSpritesheet, Vector2 position, SoundEffect jumpingSound, SoundEffect hitObstacleSound)
     {
         Position = position;
