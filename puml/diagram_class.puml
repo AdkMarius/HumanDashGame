@@ -1,0 +1,275 @@
+@startuml
+class Game{
+ 
+}
+
+class HumanDashGame{
+    - _runnerTexture : Texture2D
+    - _slidingRunnerTexture : Texture2D
+    - _decorTexture : Texture2D
+    - _solTexture : Texture2D
+    - _spriteSheet : Texture2D
+    - _buttonPressSound : SoundEffect
+    - _hitObstacleSound : SoundEffect
+    - _previousKeyboardState : keyboardState
+    - _graphics : GraphicsDeviceManager
+    - _spriteBatch : SpriteBatch
+    + HumanDashGame()
+    - StartGame() : bool
+    - game_replay(sender : object, e: EvenArgs) : void
+    - avatar_JumComplete( sender : object, e : EventArgs) : void
+    - avatar_Died( sender : object, e : EventArgs) : void
+    # Initialize() : void
+    # LoadContent() : void
+    # Update() : void
+    # Draw() : void 
+}
+class EntityManager {
+    - _entities : List<IGameEntity>
+    - _entitiesToAdd : List<IGameEntity>
+    - _entitiesToRemote : List<IGameEntity>
+    + EntityManager()
+    + AddEntity(entity: IGameEntity) : void
+    + RemoveEntity(entity: IGameEntity) : void
+    + ClearEntity() : void
+    + UpdateEntities(gameTime: GameTime) : void
+    + DrawEntities(gameTime: GameTime, spriteBatch:SpriteBatch) : void
+}
+
+interface IGameEntity{
+    + DrawOrder{ get; } : int
+    + Update (gameTime: GameTime) : void
+    + Draw (gameTime: GameTime, spriteBatch: SpriteBatch) : void
+}
+
+
+class ScoreBoard {
+    - doc : XmlDocument
+    - _nsmgr : XmlNameSpaceManager
+    - <u>binPath : String </u>
+    - <u> projectDirectory : string </u>
+    - _filePath : string
+    - _avatar : Avatar
+    - _texture : Texture2D
+    - _scoreSprite : Sprite
+    - _hILettersSprite : Sprite
+    + Score { get; set; } : int
+    + HighestScore { get; set; } : int
+    + DisplayScore { get; set; } : int
+    + HasHighScore { get; } : bool
+    + Position { get; set; } : Vector2
+    + ScoreBoard (texture : Texture2D, position : Vector2, avatar : Avatar)
+    - DrawScore (spriteBatch:SpriteBatch, score : int, startPosX : float) : void
+    - SpriltDigits (input : int) : int[]
+    + GetHighScoreFromXmlFile() : void
+    + SetHighScore() : void 
+    + Update (gameTime: GameTime) : void
+    + Draw (spriteBatch:SpriteBatch, gameTime: GameTime) : void
+}
+
+class Avatar {
+    - _jumpingSound : SoundEffect
+    - _hitSound : SoundEffect
+    - _verticalVelocity : float
+    - _dropVelocity : float
+    - _startRunnerPosY : float
+    + State { get; } : AvatarState
+    + Position { get; set; } : Vector2D
+    + Speed { get; set; }
+    + IsAlive { get; } : bool
+    + JumpComplete : EventHandler
+    + Died : EventHandler
+    + Avatar()
+    + StartJump () : bool 
+    + CancelJump () : bool
+    + GetUp () : bool 
+    + Drop () : bool 
+    + Slide () : bool 
+    + Die () : bool
+    - CreateRunningAnimation() : void
+    - AddSpriteInFrameAnimation() : void
+    - CreateSlidingAnimation() : void
+    # OnJumpComplete() : void
+    + Initialize() : void
+}
+
+enum AvatarState{
+    Idle
+    Jumping
+    Falling
+    Running
+    Sliding
+}
+
+enum GameState {
+    Initial
+    Transition
+    Playing
+    GameOver
+    }
+
+class Sprite{
+    + Sprite (texture : Texture2D, x : int, y : int, width : int, height : int)
+    + Texture { get; set; } : Texture2D
+    + X { get; set; } : int
+    + Y { get; set; } : int
+    + Width { get; set; } : int
+    + Height { get; set; } : int
+    + Draw(spriteBatch:SpriteBatch) : void
+}
+
+class SpriteAnimationFrame{
+    + Sprite { get; set; }
+    + TimeStamp { get; } : double
+}
+
+class SpriteAnimation{
+    - _frames: List<SpriteAnimationFrame>
+    + isPlaying { get; set; } : bool
+    + playbackProgress { get; set; } : double
+    + CurrentFrame { get; } : SpriteAnimationFrame
+    + Duration { get; } : double
+    +AddFrame(spite : Sprite, timeStamp : double) : void
+    + Update (gameTime: GameTime) : void
+    + Start() : void
+    + Stop () : void
+    + GetFrame(index: int) : SpriteAnimationFrame    
+}
+
+class InputController{
+    - _avatar : Avatar
+    - _previousKeyboardState : keyboardState
+    + InputController(avatar : Avatar)
+    + ProcessControls(gameTime: GameTime) : void
+    
+}
+
+interface ICollidable {
+    + CollisionBox { get; } : Rectangle
+}
+
+enum ObstacleType {
+    Panel 
+    StopPanel
+    Trash
+}
+
+enum TrashSize {
+    Small
+    Medium
+    Large
+}
+
+class GameOverScreen {
+    - _textSprite : Sprite
+    - _buttonSprite : Sprite
+    + GameOverScreen (texture : Texture2D)
+    - ButtonBounds { get; } : Rectangle
+    - ButtonPosition { get; } : Vector2
+    + Position { get; set; } Vector2
+    + IsEnabled { get; set; } : bool
+    + Replay : EventHandler
+    
+}
+class GroundObstacle{
+    - _spriteWigth : int
+    + GroundObstacle ( texture : Texrure2D,  avatar : Avatar, position : Vector2, obstacleType : ObstacleType)
+    + CollisionBox {get; } : Rectangle
+    + Draw (gameTime: GameTime, spriteBatch:SpriteBatch) : void
+}
+
+class ObstacleManager{
+    - _random : Random
+    - _avatar : Avatar
+    - _spriteSheet : Texrure2D
+    - _obstacles : List<Obstacle>
+    - _removedObstacles : List<Obstacle>
+    + ObstacleManager (avatar : Avatar, _spriteSheet : Texture2D, scoreBoard : ScoreBoard)
+    + ScoreBoard { get; } : Score
+    + LastSpawnScore { get; set; } : double
+    + CurrentTargerDistance { get; set; } : double
+    + IsEnable { get; set; } : bool
+    + CanSpawnObstacles { get; } : bool
+    - SpawnRandomObstacle()  : void
+    + RemoveAllObstacles() : void
+    + Initialize() : void
+    + Update (gameTime: GameTime) : void
+    + Draw (gameTime: GameTime, spriteBatch: SpriteBatch) : void
+}
+
+class Obstacle {
+    - _avatar : Avatar
+    - _collisionManager : CollisionManager
+    # Obstacle (avatar : Avatar, Position : Vector2)
+    + CollisionBox { get; } : Rectangle
+    + Position { get; set; } : Vector2
+    + Update (gameTime: GameTime) : void
+    + Draw (gameTime: GameTime, spriteBatch : SpriteBatch) : void
+}
+
+class GroundManager {
+    - _groundTiles : List<GroundTiles>
+    - _random : _random
+    - _avatar : Avatar
+    + GroundManager(groundTileTexture : Texture2D, avatar: Avatar)
+    - createGroundTiles(GroundTileTexture : Texture2D) : void
+    - Initialize() : void
+    - SpawnTile(GroundTile : GroundTile) : void
+    - GetRightMostTilePosition() : float
+}
+
+class GroundTile{
+    - _positionY : float
+    + GroundTile (spriteTexture2D : Texture2D, position : Vector2, spriteNumber : int, avatar : Avatar
+    , defaultTextureWidth : int, defaultTextureHeight : int)
+    + PositionX {get; set; } : float
+}
+
+class CollisionManager {
+    - _avatar : Avatar
+    - _obstacle : Obstacle
+    + CollisionManager (avatar : Avatar, obstacle : Obstacle)
+    + CheckCollision() : void
+}
+  
+Game <|-- HumanDashGame
+
+Obstacle <|-- GroundObstacle
+Obstacle ..|> ICollidable
+Obstacle *--|> CollisionManager : _collisionManager
+Obstacle *--|> Sprite : Sprite
+IGameEntity <|.. ScoreBoard
+IGameEntity <|.. GroundTile
+IGameEntity <|.. GroundManager
+IGameEntity <|-- GameOverScreen
+IGameEntity <|.. Avatar
+IGameEntity <|.. Obstacle
+IGameEntity <|.. GroundObstacle
+GroundTile "1..*" <|--* "1" GroundManager
+GroundTile *--|> Sprite : Sprite
+
+HumanDashGame *--|> GroundManager : _groundManager
+HumanDashGame *--|> EntityManager : _entityManager
+HumanDashGame o--|> GameState
+HumanDashGame *--|> GameOverScreen : _gameOverScreen
+HumanDashGame *--|> ObstacleManager : _obstacleManager
+HumanDashGame *--|> ScoreBoard : scoreBoard
+HumanDashGame *--|> Avatar : _avatar
+
+ScoreBoard *--|> Sprite : Sprite
+
+Avatar o--> AvatarState
+Avatar *--|> Sprite : Sprite
+Avatar ..|> ICollidable
+Avatar <|--o InputController
+
+SpriteAnimation *--> SpriteAnimationFrame
+
+SpriteAnimationFrame o--> Sprite : Sprite
+
+GroundObstacle <|--* ObstacleManager
+GroundObstacle o--|> ObstacleType
+GroundObstacle o--|> TrashSize
+
+
+@enduml
